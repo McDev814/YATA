@@ -1,4 +1,12 @@
+#!/usr/bin/python
+
 from Task import Task
+import csv
+import sys
+
+current_id = 1
+tasks = {}
+running = True
 
 
 def choices():
@@ -9,9 +17,26 @@ def choices():
     print('h - help (display this menu again)\n')
 
 
-current_id = 1
-tasks = {}
-running = True
+def save(task_dict):
+    with open('data.csv', 'w', newline='') as csv_file:
+        writer = csv.writer(csv_file)
+        for k, v in task_dict.items():
+            writer.writerow([k, v.title, v.description, v.created])
+        csv_file.close()
+
+
+def open_csv():
+    with open(sys.argv[1]) as csv_file:
+        reader = csv.reader(csv_file)
+        global current_id
+        for row in reader:
+            tasks[row[0]] = Task(row[1], row[2], created=row[3])
+            current_id += 1
+        csv_file.close()
+
+
+if len(sys.argv) > 1:
+    open_csv()
 choices()
 while (running):
     choice = input('--> ')
@@ -22,8 +47,9 @@ while (running):
         current_id += 1
     elif choice == '2':
         for k, v in tasks.items():
-            print(f'{k} : {v.title} | {v.description}')
+            print(f'{k} : {v.title} | {v.description} | {v.created}')
     elif choice == 'x':
+        save(tasks)
         running = False
     elif choice == 'h':
         choices()
