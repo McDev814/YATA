@@ -25,18 +25,30 @@ def save(task_dict):
         csv_file.close()
 
 
-def open_csv():
-    with open(sys.argv[1]) as csv_file:
-        reader = csv.reader(csv_file)
-        global current_id
-        for row in reader:
-            tasks[row[0]] = Task(row[1], row[2], created=row[3])
-            current_id += 1
-        csv_file.close()
+def open_csv(file_name):
+    try:
+        with open(file_name) as csv_file:
+            reader = csv.reader(csv_file)
+            global current_id
+            for row in reader:
+                tasks[row[0]] = Task(row[1], row[2], created=row[3])
+                current_id += 1
+            csv_file.close()
+    except (FileNotFoundError):
+        print(f'It appears that {sys.argv[1]} does not exist')
+        print('Perhaps it was a mispelling?')
+        file_choice = input('Enter the name of the csv file, 0 to exit, or leave blank to start a new Todo list: ')
+        if file_choice == '0':
+            exit()
+        elif file_choice != '':
+            open_csv(file_choice)
+    except Exception as e:
+        print('An unforseen error has occured:')
+        print(e)
 
 
 if len(sys.argv) > 1:
-    open_csv()
+    open_csv(sys.argv[1])
 choices()
 while (running):
     choice = input('--> ')
